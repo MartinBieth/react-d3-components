@@ -2,6 +2,9 @@ let React = require('react');
 let ReactDOM = require('react-dom');
 let d3 = require('d3');
 
+var tooltip = function (x, y0, y, total) {
+    return y.toString();
+};
 
 let TooltipMixin = {
     propTypes: {
@@ -23,7 +26,7 @@ let TooltipMixin = {
         return {
             tooltipMode: 'mouse',
             tooltipOffset: {top: -35, left: 0},
-            tooltipHtml: null,
+            tooltipHtml: tooltip,
             tooltipContained: false
         };
     },
