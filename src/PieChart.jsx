@@ -40,7 +40,8 @@ let DataSet = React.createClass({
 		stroke: React.PropTypes.string,
 		fill: React.PropTypes.string,
 		opacity: React.PropTypes.number,
-		x: React.PropTypes.func.isRequired
+		x: React.PropTypes.func.isRequired,
+        asLegend: React.PropTypes.bool
 	},
 
 	getDefaultProps() {
@@ -65,7 +66,8 @@ let DataSet = React.createClass({
 			 x,
 			 y,
 			 onMouseEnter,
-			 onMouseLeave} = this.props;
+			 onMouseLeave,
+             asLegend} = this.props;
 
 		let wedges = pie.map((e, index) => {
 			function midAngle(d){
@@ -82,6 +84,28 @@ let DataSet = React.createClass({
 			let linePos = outerArc.centroid(e);
 			linePos[0] = radius * 0.95 * (midAngle(e) < Math.PI ? 1 : -1);
 
+            let legend;
+
+            if (asLegend) {
+                legend = (
+                    <div>
+                        <polyline
+                            opacity={opacity}
+                            strokeWidth={strokeWidth}
+                            stroke={stroke}
+                            fill={fill}
+                            points={[arc.centroid(e), outerArc.centroid(e), linePos]}
+                        />
+
+                        <text
+                        dy=".35em"
+                        x={labelPos[0]}
+                        y={labelPos[1]}
+                        textAnchor={textAnchor}>{x(e.data)}</text>
+                    </div>
+                );
+            }
+
 			return (
 					<g key={`${x(e.data)}.${y(e.data)}.${index}`} className="arc">
 					<Wedge
@@ -91,20 +115,7 @@ let DataSet = React.createClass({
 				onMouseEnter={onMouseEnter}
 				onMouseLeave={onMouseLeave}
 					/>
-
-					<polyline
-				opacity={opacity}
-				strokeWidth={strokeWidth}
-				stroke={stroke}
-				fill={fill}
-				points={[arc.centroid(e), outerArc.centroid(e), linePos]}
-					/>
-
-					<text
-				dy=".35em"
-				x={labelPos[0]}
-				y={labelPos[1]}
-				textAnchor={textAnchor}>{x(e.data)}</text>
+                    {legend}
 					</g>
 			);
 		});
@@ -129,7 +140,8 @@ let PieChart = React.createClass({
 		labelRadius: React.PropTypes.number,
 		padRadius: React.PropTypes.string,
 		cornerRadius: React.PropTypes.number,
-		sort: React.PropTypes.any
+		sort: React.PropTypes.any,
+        asLegend: React.PropTypes.bool
 	},
 
 	getDefaultProps() {
@@ -139,7 +151,8 @@ let PieChart = React.createClass({
 			labelRadius: null,
             padRadius: 'auto',
 			cornerRadius: 0,
-			sort: undefined
+			sort: undefined,
+            asLegend: true
 		};
 	},
 
@@ -163,7 +176,8 @@ let PieChart = React.createClass({
 			 sort,
 			 x,
 			 y,
-			 values} = this.props;
+			 values,
+             asLegend} = this.props;
 
 		let [innerWidth,
 			 innerHeight] = [this._innerWidth,
@@ -218,6 +232,7 @@ let PieChart = React.createClass({
 			y={y}
 			onMouseEnter={this.onMouseEnter}
 			onMouseLeave={this.onMouseLeave}
+            asLegend={asLegend}
 				/>
 				</g>
 				{ this.props.children }
